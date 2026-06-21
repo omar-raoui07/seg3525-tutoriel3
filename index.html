@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MemoGarden</title>
+  <style>
+    :root {
+      --bg: #f3f7f2;
+      --bg-accent: #e7f0e6;
+      --surface: #ffffff;
+      --primary: #5b8c5a;
+      --primary-dark: #406b40;
+      --text: #2c3a2c;
+      --muted: #7a8a78;
+      --good: #6fbf73;
+      --bad: #e08e8e;
+      --gold: #d6a84f;
+      --radius: 16px;
+      --shadow: 0 6px 20px rgba(60, 90, 60, 0.12);
+      --font: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font);
+      color: var(--text);
+      background: linear-gradient(160deg, var(--bg), var(--bg-accent));
+      min-height: 100vh;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .card-panel, .game-panel {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      width: 100%;
+    }
+
+    .card-panel {
+      max-width: 470px;
+      padding: 40px 32px;
+      text-align: center;
+    }
+
+    .game-panel {
+      max-width: 900px;
+      padding: 28px;
+    }
+
+    .title { font-size: 2.1rem; color: var(--primary-dark); margin-bottom: 8px; }
+    .subtitle { color: var(--muted); margin-bottom: 28px; line-height: 1.5; }
+
+    .config {
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      margin-bottom: 28px;
+      text-align: left;
+    }
+
+    .config-label { display: block; font-weight: 700; margin-bottom: 10px; }
+    .options { display: flex; flex-wrap: wrap; gap: 10px; }
+
+    .choice-btn, .primary-btn, .secondary-btn {
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+    }
+
+    .choice-btn {
+      padding: 10px 14px;
+      background: #eef4ed;
+      color: var(--text);
+      border: 2px solid transparent;
+    }
+
+    .choice-btn.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary-dark);
+    }
+
+    .primary-btn {
+      width: 100%;
+      padding: 14px 18px;
+      background: var(--primary);
+      color: #fff;
+      font-size: 1rem;
+      box-shadow: var(--shadow);
+    }
+
+    .secondary-btn {
+      padding: 11px 16px;
+      background: #eef4ed;
+      color: var(--primary-dark);
+      border: 1px solid #d7e4d5;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+
+    .game-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 22px;
+      flex-wrap: wrap;
+    }
+
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .stat {
+      background: #f3f7f2;
+      border-radius: 12px;
+      padding: 10px 12px;
+      min-width: 92px;
+      text-align: center;
+      border: 1px solid #e1eadf;
+    }
+
+    .stat small { display: block; color: var(--muted); font-weight: 600; margin-bottom: 4px; }
+    .stat strong { color: var(--primary-dark); }
+
+    .feedback {
+      margin: 0 0 18px;
+      min-height: 28px;
+      color: var(--primary-dark);
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(76px, 1fr));
+      gap: 14px;
+      max-width: 620px;
+      margin: 0 auto 22px;
+    }
+
+    .memory-card {
+      aspect-ratio: 1;
+      border: none;
+      border-radius: 18px;
+      background: var(--primary);
+      color: white;
+      font-size: clamp(2rem, 6vw, 3.4rem);
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(64, 107, 64, .18);
+      transition: transform .2s ease, background .2s ease, box-shadow .2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+    }
+
+    .memory-card:hover { transform: translateY(-2px); }
+    .memory-card.flipped { background: #fff9eb; color: var(--text); border: 2px solid var(--gold); }
+    .memory-card.matched { background: #ecf8ec; color: var(--text); border: 2px solid var(--good); cursor: default; }
+    .memory-card.wrong { background: #fff0f0; border: 2px solid var(--bad); }
+
+    .progress-wrap { margin: 0 auto 18px; max-width: 620px; }
+    .progress-text { display: flex; justify-content: space-between; margin-bottom: 8px; color: var(--muted); font-size: .95rem; font-weight: 600; }
+    .progress-bar { height: 10px; border-radius: 999px; background: #e6eee4; overflow: hidden; }
+    .progress-fill { height: 100%; width: 0%; background: var(--primary); transition: width .25s ease; }
+
+    .game-actions { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+
+    .hidden { display: none !important; }
+    .result-line { margin: 8px 0; font-size: 1.05rem; }
+
+    @media (max-width: 640px) {
+      .app { padding: 14px; }
+      .card-panel, .game-panel { padding: 24px 18px; }
+      .title { font-size: 1.75rem; }
+      .grid { grid-template-columns: repeat(4, minmax(58px, 1fr)); gap: 10px; }
+      .stats { width: 100%; justify-content: center; }
+      .game-header { align-items: center; text-align: center; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section id="home" class="card-panel">
+      <h1 class="title">🌿 MemoGarden</h1>
+      <p class="subtitle">Un jeu de mémoire visuelle où tu dois retrouver toutes les paires en utilisant le moins de coups possible.</p>
+
+      <div class="config">
+        <div>
+          <span class="config-label">Niveau</span>
+          <div class="options" id="levelOptions"></div>
+        </div>
+        <div>
+          <span class="config-label">Thème</span>
+          <div class="options" id="themeOptions"></div>
+        </div>
+      </div>
+
+      <button class="primary-btn" id="startBtn">Commencer</button>
+    </section>
+
+    <section id="game" class="game-panel hidden">
+      <div class="game-header">
+        <div>
+          <h1 class="title">MemoGarden</h1>
+          <p class="subtitle" id="gameSubtitle">Retrouve les paires cachées.</p>
+        </div>
+        <div class="stats">
+          <div class="stat"><small>Temps</small><strong id="timeStat">0s</strong></div>
+          <div class="stat"><small>Coups</small><strong id="movesStat">0</strong></div>
+          <div class="stat"><small>Paires</small><strong id="pairsStat">0/4</strong></div>
+        </div>
+      </div>
+
+      <p class="feedback" id="feedback">Clique sur deux cartes pour trouver une paire.</p>
+
+      <div class="progress-wrap">
+        <div class="progress-text"><span>Progression</span><span id="progressText">0%</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+
+      <div class="grid" id="grid"></div>
+
+      <div class="game-actions">
+        <button class="secondary-btn" id="restartBtn">Recommencer</button>
+        <button class="secondary-btn" id="menuBtn">Retour au menu</button>
+      </div>
+    </section>
+
+    <section id="end" class="card-panel hidden">
+      <h1 class="title">🎉 Partie terminée</h1>
+      <p class="subtitle">Toutes les paires ont été trouvées.</p>
+      <p class="result-line"><strong>Temps :</strong> <span id="finalTime">0s</span></p>
+      <p class="result-line"><strong>Coups :</strong> <span id="finalMoves">0</span></p>
+      <p class="result-line"><strong>Score :</strong> <span id="finalScore">1000</span></p>
+      <br />
+      <button class="primary-btn" id="playAgainBtn">Rejouer</button>
+      <br /><br />
+      <button class="secondary-btn" id="endMenuBtn">Retour au menu</button>
+    </section>
+  </main>
+
+  <script>
+    const THEMES = {
+      Animaux: ['🐰', '🦊', '🐸', '🐢', '🦉', '🐝', '🐠', '🦋'],
+      Nature: ['🌸', '🌻', '🍄', '🌿', '🌵', '🍁', '🌳', '🌷'],
+      Fruits: ['🍓', '🍒', '🍋', '🍇', '🍑', '🍍', '🥝', '🍉']
+    };
+
+    const LEVELS = { Débutant: 4, Intermédiaire: 6, Avancé: 8 };
+
+    let selectedLevel = 'Débutant';
+    let selectedTheme = 'Animaux';
+    let deck = [];
+    let flipped = [];
+    let matched = [];
+    let wrong = [];
+    let moves = 0;
+    let seconds = 0;
+    let timer = null;
+    let locked = false;
+
+    const home = document.getElementById('home');
+    const game = document.getElementById('game');
+    const end = document.getElementById('end');
+    const grid = document.getElementById('grid');
+    const feedback = document.getElementById('feedback');
+
+    function show(screen) {
+      home.classList.add('hidden');
+      game.classList.add('hidden');
+      end.classList.add('hidden');
+      document.getElementById(screen).classList.remove('hidden');
+    }
+
+    function shuffle(array) {
+      const a = [...array];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function buildDeck() {
+      const pairs = LEVELS[selectedLevel];
+      const picked = THEMES[selectedTheme].slice(0, pairs);
+      const cards = picked.flatMap((emoji, index) => [
+        { id: index + '-a', emoji, pairId: index },
+        { id: index + '-b', emoji, pairId: index }
+      ]);
+      return shuffle(cards);
+    }
+
+    function renderOptions() {
+      const levelOptions = document.getElementById('levelOptions');
+      const themeOptions = document.getElementById('themeOptions');
+      levelOptions.innerHTML = '';
+      themeOptions.innerHTML = '';
+
+      Object.keys(LEVELS).forEach(level => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn' + (selectedLevel === level ? ' active' : '');
+        btn.textContent = `${level} (${LEVELS[level]} paires)`;
+        btn.onclick = () => { selectedLevel = level; renderOptions(); };
+        levelOptions.appendChild(btn);
+      });
+
+      Object.keys(THEMES).forEach(theme => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn' + (selectedTheme === theme ? ' active' : '');
+        btn.textContent = theme;
+        btn.onclick = () => { selectedTheme = theme; renderOptions(); };
+        themeOptions.appendChild(btn);
+      });
+    }
+
+    function updateStats() {
+      const totalPairs = LEVELS[selectedLevel];
+      const percent = Math.round((matched.length / totalPairs) * 100);
+      document.getElementById('timeStat').textContent = seconds + 's';
+      document.getElementById('movesStat').textContent = moves;
+      document.getElementById('pairsStat').textContent = `${matched.length}/${totalPairs}`;
+      document.getElementById('progressText').textContent = percent + '%';
+      document.getElementById('progressFill').style.width = percent + '%';
+    }
+
+    function renderGrid() {
+      grid.innerHTML = '';
+      deck.forEach((card, index) => {
+        const isFlipped = flipped.includes(index) || matched.includes(card.pairId);
+        const isMatched = matched.includes(card.pairId);
+        const isWrong = wrong.includes(index);
+        const btn = document.createElement('button');
+        btn.className = 'memory-card' + (isFlipped ? ' flipped' : '') + (isMatched ? ' matched' : '') + (isWrong ? ' wrong' : '');
+        btn.setAttribute('aria-label', isFlipped ? `Carte ${card.emoji}` : 'Carte cachée');
+        btn.textContent = isFlipped ? card.emoji : '❧';
+        btn.disabled = isMatched || locked;
+        btn.onclick = () => flipCard(index);
+        grid.appendChild(btn);
+      });
+      updateStats();
+    }
+
+    function startGame() {
+      clearInterval(timer);
+      deck = buildDeck();
+      flipped = [];
+      matched = [];
+      wrong = [];
+      moves = 0;
+      seconds = 0;
+      locked = false;
+      document.getElementById('gameSubtitle').textContent = `${selectedLevel} • ${selectedTheme}`;
+      feedback.textContent = 'Clique sur deux cartes pour trouver une paire.';
+      show('game');
+      renderGrid();
+      timer = setInterval(() => { seconds++; updateStats(); }, 1000);
+    }
+
+    function flipCard(index) {
+      if (locked || flipped.includes(index) || matched.includes(deck[index].pairId)) return;
+      flipped.push(index);
+      renderGrid();
+
+      if (flipped.length === 2) {
+        moves++;
+        const [a, b] = flipped;
+        if (deck[a].pairId === deck[b].pairId) {
+          matched.push(deck[a].pairId);
+          feedback.textContent = '✅ Bonne paire trouvée !';
+          flipped = [];
+          renderGrid();
+          if (matched.length === LEVELS[selectedLevel]) {
+            setTimeout(finishGame, 500);
+          }
+        } else {
+          wrong = [a, b];
+          feedback.textContent = '❌ Pas la même paire. Essaie encore.';
+          locked = true;
+          renderGrid();
+          setTimeout(() => {
+            flipped = [];
+            wrong = [];
+            locked = false;
+            feedback.textContent = 'Clique sur deux cartes pour trouver une paire.';
+            renderGrid();
+          }, 800);
+        }
+      }
+      updateStats();
+    }
+
+    function finishGame() {
+      clearInterval(timer);
+      const score = Math.max(1000 - moves * 20 - seconds * 5, 100);
+      document.getElementById('finalTime').textContent = seconds + 's';
+      document.getElementById('finalMoves').textContent = moves;
+      document.getElementById('finalScore').textContent = score;
+      show('end');
+    }
+
+    function backToMenu() {
+      clearInterval(timer);
+      show('home');
+    }
+
+    document.getElementById('startBtn').onclick = startGame;
+    document.getElementById('restartBtn').onclick = startGame;
+    document.getElementById('menuBtn').onclick = backToMenu;
+    document.getElementById('playAgainBtn').onclick = startGame;
+    document.getElementById('endMenuBtn').onclick = backToMenu;
+
+    renderOptions();
+  </script>
+</body>
+</html>

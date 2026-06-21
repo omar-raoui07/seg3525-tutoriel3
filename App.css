@@ -1,0 +1,263 @@
+:root {
+  --bg: #f3f7f2;
+  --bg-accent: #e7f0e6;
+  --surface: #ffffff;
+  --primary: #5b8c5a;
+  --primary-dark: #406b40;
+  --text: #2c3a2c;
+  --muted: #7a8a78;
+  --good: #6fbf73;
+  --bad: #e08e8e;
+  --radius: 16px;
+  --shadow: 0 6px 20px rgba(60, 90, 60, 0.12);
+  --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font);
+  color: var(--text);
+  background: linear-gradient(160deg, var(--bg), var(--bg-accent));
+  min-height: 100vh;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+/* ---- Panneaux (accueil / fin) ---- */
+.card-panel {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 40px 32px;
+  width: 100%;
+  max-width: 440px;
+  text-align: center;
+}
+
+.title {
+  font-size: 2rem;
+  color: var(--primary-dark);
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: var(--muted);
+  margin-bottom: 28px;
+}
+
+/* ---- Configuration ---- */
+.config {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  margin-bottom: 28px;
+  text-align: left;
+}
+
+.config-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: var(--text);
+}
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.chip {
+  border: 2px solid var(--bg-accent);
+  background: var(--bg);
+  color: var(--text);
+  padding: 10px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.15s ease;
+}
+
+.chip:hover {
+  border-color: var(--primary);
+}
+
+.chip-active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.chip-meta {
+  opacity: 0.7;
+  font-size: 0.8rem;
+}
+
+/* ---- Boutons ---- */
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 14px 28px;
+  font-size: 1.05rem;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.15s ease;
+  width: 100%;
+}
+
+.btn-primary:hover {
+  background: var(--primary-dark);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--muted);
+  border: 2px solid var(--bg-accent);
+  padding: 12px 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+
+.btn-ghost:hover {
+  color: var(--text);
+  border-color: var(--muted);
+}
+
+/* ---- Écran de jeu ---- */
+.play {
+  width: 100%;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.hud {
+  display: flex;
+  justify-content: space-around;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
+}
+
+.hud-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hud-label {
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.hud-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+/* ---- Grille ---- */
+.grid {
+  display: grid;
+  gap: 12px;
+}
+
+.tile {
+  aspect-ratio: 1;
+  border: none;
+  border-radius: 14px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.tile:hover {
+  transform: translateY(-2px);
+}
+
+.tile-up {
+  background: var(--surface);
+}
+
+.tile-matched {
+  background: var(--good);
+  cursor: default;
+}
+
+.tile-wrong {
+  background: var(--bad);
+}
+
+.tile-inner {
+  pointer-events: none;
+}
+
+/* ---- Score (fin) ---- */
+.score {
+  background: var(--bg);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.score-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--bg-accent);
+}
+
+.score-row:last-child {
+  border-bottom: none;
+}
+
+.score-row strong {
+  color: var(--primary-dark);
+}
+
+.end-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.end-actions .btn-primary {
+  flex: 1;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 480px) {
+  .card-panel {
+    padding: 28px 20px;
+  }
+  .tile {
+    font-size: 1.5rem;
+  }
+  .hud-value {
+    font-size: 1.1rem;
+  }
+}
